@@ -144,3 +144,6 @@ Scan the QR code using [Dingtalk App](https://www.dingtalk.com/) to join in disc
 
 ## LICENSE
 [MIT](LICENSE)
+
+# 补充功能
+1. Datepicker增加显示周次选项(showWeekNumber)

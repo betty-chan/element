@@ -97,6 +97,7 @@
               :default-value="defaultValue ? new Date(defaultValue) : null"
               :date="date"
               :cell-class-name="cellClassName"
+              :show-week-number="showWeekNumber"
               :disabled-date="disabledDate">
             </date-table>
             <year-table
@@ -170,12 +171,9 @@
   import YearTable from '../basic/year-table';
   import MonthTable from '../basic/month-table';
   import DateTable from '../basic/date-table';
-
   export default {
     mixins: [Locale],
-
     directives: { Clickoutside },
-
     watch: {
       showTime(val) {
         /* istanbul ignore if */
@@ -187,7 +185,6 @@
           }
         });
       },
-
       value(val) {
         if (this.selectionMode === 'dates' && this.value) return;
         if (isDate(val)) {
@@ -196,17 +193,14 @@
           this.date = this.getDefaultValue();
         }
       },
-
       defaultValue(val) {
         if (!isDate(this.value)) {
           this.date = val ? new Date(val) : new Date();
         }
       },
-
       timePickerVisible(val) {
         if (val) this.$nextTick(() => this.$refs.timepicker.adjustSpinners());
       },
-
       selectionMode(newVal) {
         if (newVal === 'month') {
           /* istanbul ignore next */
@@ -218,29 +212,24 @@
         }
       }
     },
-
     methods: {
       proxyTimePickerDataProperties() {
         const format = timeFormat => {this.$refs.timepicker.format = timeFormat;};
         const value = value => {this.$refs.timepicker.value = value;};
         const date = date => {this.$refs.timepicker.date = date;};
         const selectableRange = selectableRange => {this.$refs.timepicker.selectableRange = selectableRange;};
-
         this.$watch('value', value);
         this.$watch('date', date);
         this.$watch('selectableRange', selectableRange);
-
         format(this.timeFormat);
         value(this.value);
         date(this.date);
         selectableRange(this.selectableRange);
       },
-
       handleClear() {
         this.date = this.getDefaultValue();
         this.$emit('pick', null);
       },
-
       emit(value, ...args) {
         if (!value) {
           this.$emit('pick', value, ...args);
@@ -253,19 +242,15 @@
         this.userInputDate = null;
         this.userInputTime = null;
       },
-
       // resetDate() {
       //   this.date = new Date(this.date);
       // },
-
       showMonthPicker() {
         this.currentView = 'month';
       },
-
       showYearPicker() {
         this.currentView = 'year';
       },
-
       // XXX: 没用到
       // handleLabelClick() {
       //   if (this.currentView === 'date') {
@@ -274,15 +259,12 @@
       //     this.showYearPicker();
       //   }
       // },
-
       prevMonth() {
         this.date = prevMonth(this.date);
       },
-
       nextMonth() {
         this.date = nextMonth(this.date);
       },
-
       prevYear() {
         if (this.currentView === 'year') {
           this.date = prevYear(this.date, 10);
@@ -290,7 +272,6 @@
           this.date = prevYear(this.date);
         }
       },
-
       nextYear() {
         if (this.currentView === 'year') {
           this.date = nextYear(this.date, 10);
@@ -298,13 +279,11 @@
           this.date = nextYear(this.date);
         }
       },
-
       handleShortcutClick(shortcut) {
         if (shortcut.onClick) {
           shortcut.onClick(this);
         }
       },
-
       handleTimePick(value, visible, first) {
         if (isDate(value)) {
           const newDate = this.value
@@ -319,11 +298,9 @@
           this.timePickerVisible = visible;
         }
       },
-
       handleTimePickClose() {
         this.timePickerVisible = false;
       },
-
       handleMonthPick(month) {
         if (this.selectionMode === 'month') {
           this.date = modifyDate(this.date, this.year, month, 1);
@@ -335,7 +312,6 @@
           this.currentView = 'date';
         }
       },
-
       handleDatePick(value) {
         if (this.selectionMode === 'day') {
           let newDate = this.value
@@ -353,7 +329,6 @@
           this.emit(value, true); // set false to keep panel open
         }
       },
-
       handleYearPick(year) {
         if (this.selectionMode === 'year') {
           this.date = modifyDate(this.date, year, 0, 1);
@@ -365,7 +340,6 @@
           this.currentView = 'month';
         }
       },
-
       changeToNow() {
         // NOTE: not a permanent solution
         //       consider disable "now" button in the future
@@ -374,7 +348,6 @@
           this.emit(this.date);
         }
       },
-
       confirm() {
         if (this.selectionMode === 'dates') {
           this.emit(this.value);
@@ -388,7 +361,6 @@
           this.emit(value);
         }
       },
-
       resetView() {
         if (this.selectionMode === 'month') {
           this.currentView = 'month';
@@ -398,16 +370,13 @@
           this.currentView = 'date';
         }
       },
-
       handleEnter() {
         document.body.addEventListener('keydown', this.handleKeydown);
       },
-
       handleLeave() {
         this.$emit('dodestroy');
         document.body.removeEventListener('keydown', this.handleKeydown);
       },
-
       handleKeydown(event) {
         const keyCode = event.keyCode;
         const list = [38, 40, 37, 39];
@@ -422,7 +391,6 @@
           }
         }
       },
-
       handleKeyControl(keyCode) {
         const mapping = {
           'year': {
@@ -453,7 +421,6 @@
           break;
         }
       },
-
       handleVisibleTimeChange(value) {
         const time = parseDate(value, this.timeFormat);
         if (time && this.checkDateWithinRange(time)) {
@@ -464,7 +431,6 @@
           this.emit(this.date, true);
         }
       },
-
       handleVisibleDateChange(value) {
         const date = parseDate(value, this.dateFormat);
         if (date) {
@@ -477,7 +443,6 @@
           this.emit(this.date, true);
         }
       },
-
       isValidValue(value) {
         return value && !isNaN(value) && (
           typeof this.disabledDate === 'function'
@@ -485,24 +450,20 @@
             : true
         ) && this.checkDateWithinRange(value);
       },
-
       getDefaultValue() {
         // if default-value is set, return it
         // otherwise, return now (the moment this method gets called)
         return this.defaultValue ? new Date(this.defaultValue) : new Date();
       },
-
       checkDateWithinRange(date) {
         return this.selectableRange.length > 0
           ? timeWithinRange(date, this.selectableRange, this.format || 'HH:mm:ss')
           : true;
       }
     },
-
     components: {
       TimePicker, YearTable, MonthTable, DateTable, ElInput, ElButton
     },
-
     data() {
       return {
         popperClass: '',
@@ -527,28 +488,22 @@
         userInputTime: null
       };
     },
-
     computed: {
       year() {
         return this.date.getFullYear();
       },
-
       month() {
         return this.date.getMonth();
       },
-
       week() {
         return getWeekNumber(this.date);
       },
-
       monthDate() {
         return this.date.getDate();
       },
-
       footerVisible() {
         return this.showTime || this.selectionMode === 'dates';
       },
-
       visibleTime() {
         if (this.userInputTime !== null) {
           return this.userInputTime;
@@ -556,7 +511,6 @@
           return formatDate(this.value || this.defaultValue, this.timeFormat);
         }
       },
-
       visibleDate() {
         if (this.userInputDate !== null) {
           return this.userInputDate;
@@ -564,7 +518,6 @@
           return formatDate(this.value || this.defaultValue, this.dateFormat);
         }
       },
-
       yearLabel() {
         const yearTranslation = this.t('el.datepicker.year');
         if (this.currentView === 'year') {
@@ -576,7 +529,6 @@
         }
         return this.year + ' ' + yearTranslation;
       },
-
       timeFormat() {
         if (this.format) {
           return extractTimeFormat(this.format);
@@ -584,7 +536,6 @@
           return 'HH:mm:ss';
         }
       },
-
       dateFormat() {
         if (this.format) {
           return extractDateFormat(this.format);
